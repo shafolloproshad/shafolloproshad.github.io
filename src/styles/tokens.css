@@ -1,0 +1,56 @@
+/*
+ * Design tokens.
+ * The palette is taken from a heated enclosure: steel blue for cold solid,
+ * a neutral grey-white at the melting point, and a thermal red for the heated
+ * wall. Thermal red has one job on this site: it marks my own contributions.
+ */
+:root {
+  --paper: #f5f7f8;
+  --surface: #ffffff;
+  --ink: #15273a;
+  --ink-2: #44576a;
+  --ink-3: #6b7b8a;
+  --rule: #d6dee4;
+  --rule-strong: #b6c3cd;
+
+  --cold: #24527f;
+  --cold-2: #2e6ba6;
+  --cold-tint: #e6eef5;
+  --melt: #e9edf0;
+  --heat: #bf3a1e;
+  --heat-tint: #fbebe5;
+  --alu: #c9d1d8;
+
+  --font-sans: 'Schibsted Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-serif: 'Source Serif 4 Variable', Georgia, 'Times New Roman', serif;
+
+  /* Classical scale: 12 14 16 18 21 24 30 36 48 60 */
+  --fs-12: 0.75rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-18: 1.125rem;
+  --fs-21: 1.3125rem;
+  --fs-24: 1.5rem;
+  --fs-30: 1.875rem;
+  --fs-36: 2.25rem;
+  --fs-48: 3rem;
+
+  --measure: 68ch;
+  --page: 1200px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --radius: 6px;
+  --radius-sm: 4px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --focus: 0 0 0 3px var(--paper), 0 0 0 5px var(--cold-2);
+  --header-h: 64px;
+}

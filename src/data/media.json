@@ -1,0 +1,114 @@
+{
+ "media/pcm/efficiency-lmli.webp": [
+  1600,
+  1189
+ ],
+ "media/pcm/geometry.webp": [
+  1200,
+  500
+ ],
+ "media/pcm/lf-40deg-cases.webp": [
+  1600,
+  1175
+ ],
+ "media/pcm/lf-case1-angles.webp": [
+  1600,
+  1175
+ ],
+ "media/pcm/liquid-fraction-contours.webp": [
+  2600,
+  1184
+ ],
+ "media/pcm/melting-time-bars.webp": [
+  1600,
+  1183
+ ],
+ "media/pcm/mesh-independence.webp": [
+  1400,
+  1031
+ ],
+ "media/pcm/nusselt-case1.webp": [
+  1600,
+  1177
+ ],
+ "media/pcm/temperature-contours.webp": [
+  2600,
+  1171
+ ],
+ "media/pcm/timestep-independence.webp": [
+  1400,
+  1035
+ ],
+ "media/pcm/validation.webp": [
+  1600,
+  1182
+ ],
+ "media/profile/portrait.webp": [
+  640,
+  800
+ ],
+ "media/projects/wfsa-team-black-pearl.webp": [
+  1280,
+  719
+ ],
+ "media/sph/convergence.webp": [
+  1800,
+  882
+ ],
+ "media/sph/ct-time-series.webp": [
+  2400,
+  1265
+ ],
+ "media/sph/ct-vs-fr.webp": [
+  1600,
+  986
+ ],
+ "media/sph/domain-2d.webp": [
+  871,
+  198
+ ],
+ "media/sph/domain-3d.webp": [
+  1173,
+  663
+ ],
+ "media/sph/domain-overview.webp": [
+  765,
+  415
+ ],
+ "media/sph/filtering.webp": [
+  1800,
+  880
+ ],
+ "media/sph/free-surface-all.webp": [
+  1400,
+  1759
+ ],
+ "media/sph/free-surface-fr0152.webp": [
+  1792,
+  753
+ ],
+ "media/sph/free-surface-fr0195.webp": [
+  1758,
+  741
+ ],
+ "media/sph/free-surface-fr0226.webp": [
+  1750,
+  745
+ ],
+ "media/sph/free-surface-fr0260.webp": [
+  2000,
+  854
+ ],
+ "media/sph/free-surface-fr0282.webp": [
+  1750,
+  745
+ ],
+ "media/sph/kcs-body-plan.webp": [
+  673,
+  131
+ ],
+ "media/sph/mdbc.webp": [
+  451,
+  409
+ ]
+}

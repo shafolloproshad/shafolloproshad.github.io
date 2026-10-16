@@ -2,14 +2,17 @@ import { Link } from 'react-router'
 import Portrait from '../components/Portrait.jsx'
 import { profile } from '../data/profile.js'
 import { skills } from '../data/skills.js'
-import { cv } from '../data/cv.js'
+import { cvSection } from '../data/cv.js'
 import { useDocumentTitle } from '../lib/hooks.js'
 
 export default function About() {
   useDocumentTitle('About')
-  const honours = cv.find((s) => s.section === 'Honours and awards')
-  const service = cv.find((s) => s.section === 'Leadership and service')
-  const experience = cv.find((s) => s.section === 'Professional experience')
+  // Same entries as the CV (and its PDF); headings keep this page's style.
+  const lists = [
+    { ...cvSection('experience'), heading: 'Professional experience' },
+    { ...cvSection('honours'), heading: 'Honours and awards' },
+    { ...cvSection('service'), heading: 'Leadership and service' },
+  ]
 
   return (
     <>
@@ -22,19 +25,24 @@ export default function About() {
       <section className="section">
         <div className="container">
           <div className="bio">
-            <Portrait className="bio__portrait" />
-            <div className="bio__text prose">
+            <Portrait className="bio__portrait" src={profile.aboutPhoto} />
+            <div className="bio__text prose justify-text">
               <p>
-                I am a graduate of the Department of Naval Architecture and Marine Engineering at Bangladesh University
-                of Engineering and Technology (BUET). My research so far has been computational: a finite-volume study
-                of phase-change melting in a finned enclosure, now under review, and an undergraduate thesis using
-                smoothed particle hydrodynamics to predict ship resistance.
+                I graduated in June 2026 from the Department of Naval Architecture and Marine Engineering at Bangladesh
+                University of Engineering and Technology (BUET). My research so far has been numerical. In a
+                collaborative study now under review, I worked on simulations of phase-change melting in an enclosure
+                with K-shaped fins, and in my undergraduate thesis I used smoothed particle hydrodynamics to predict
+                the calm-water resistance of a container ship.
               </p>
               <p>
-                What interests me most is the part of a simulation study that decides whether its numbers can be
-                trusted: choosing the model, showing that results do not depend on the mesh, particle spacing or time
-                step, comparing with experiment, and explaining the physics behind the trends. I want to build on this
-                in graduate research on thermal-fluid problems.
+                Through this work, I have become most interested in what makes a simulation reliable: choosing a
+                suitable model, verifying that the results do not depend on the mesh, particle spacing or time step,
+                validating them against experimental data, and interpreting the physics behind the trends.
+              </p>
+              <p>
+                I hope to continue with further study in computational fluid dynamics and related fields. My
+                experience so far has been in phase change and ship resistance, but I am open to a broader range of
+                fluid-flow and heat-transfer applications.
               </p>
             </div>
           </div>
@@ -72,7 +80,7 @@ export default function About() {
           </h2>
           <ul className="interest-list">
             {profile.interests.map((i) => (
-              <li key={i}>{i}</li>
+              <li key={i.title}>{i.title}</li>
             ))}
           </ul>
         </div>
@@ -109,15 +117,15 @@ export default function About() {
         </div>
       </section>
 
-      {[experience, honours, service].map((sec) => (
-        <section key={sec.section} className="section" aria-label={sec.section}>
+      {lists.map((sec) => (
+        <section key={sec.id} className="section" aria-label={sec.heading}>
           <div className="container two-col">
-            <h2 className="section__title">{sec.section}</h2>
+            <h2 className="section__title">{sec.heading}</h2>
             <ul className="plain-list">
               {sec.entries.map((e) => (
                 <li key={e.title}>
                   <span className="plain-list__title">{e.title}</span>
-                  <span className="plain-list__org">{e.org}</span>
+                  {e.org && <span className="plain-list__org">{e.org}</span>}
                   <span className="plain-list__period">{e.period}</span>
                 </li>
               ))}

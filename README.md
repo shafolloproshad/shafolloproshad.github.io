@@ -86,10 +86,20 @@ GitHub Pages has no server-side routing, so `npm run build` copies
 `/research/pcm-k-shaped-fins` loads that page, and the app shows the right
 content.
 
-## The live figure on the home page
+## The melting figure on the home page
 
-`src/lib/meltModel.js` is a small explicit finite-volume solver for 2D
-conduction with melting (enthalpy method), drawn by
-`src/components/MeltSolverFigure.jsx`. It is an illustration, not the
-manuscript's Fluent model: the fin is held at the wall temperature and natural
-convection is left out. The caption on the page says so.
+`src/components/FluentMeltingFigure.jsx` plays back the manuscript's ANSYS
+Fluent results for Case 1 (both arms 30 mm, fin angles 10° to 80°). There is
+no solver in the browser. The temperature and liquid-fraction fields were read
+back from the published contour plots (Figs. 9 and 10) by
+`scripts/extract-contour-fields.py` and stored as small PNG data images in
+`public/media/pcm/fields/` (red channel: temperature on 20 to 70 °C, green
+channel: liquid fraction). Values are therefore approximate, and the caption on
+the page says so. The fin outlines are drawn from the geometry in
+`src/lib/finGeometry.js`.
+
+To regenerate the data images from the two figure files:
+
+```
+python scripts/extract-contour-fields.py fig9.png fig10.png
+```

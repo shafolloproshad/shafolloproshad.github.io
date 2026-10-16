@@ -195,7 +195,7 @@ export function CtChart({ rows }) {
         )}
       </div>
       <p className="chart__note">
-        <Rich>Values of C_T × 10³ from Table 5.1 of the thesis. Hover or focus a Froude number for values.</Rich>
+        <Rich>Predicted and measured C_T × 10³ at the five Froude numbers. Hover or focus a Froude number for values.</Rich>
       </p>
     </figure>
   )

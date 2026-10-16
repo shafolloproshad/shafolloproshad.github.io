@@ -1,17 +1,21 @@
 import { Link } from 'react-router'
-import MeltSolverFigure from '../components/MeltSolverFigure.jsx'
-import ResearchEntry from '../components/ResearchEntry.jsx'
-import MethodComparison from '../components/MethodComparison.jsx'
+import FlowMotif from '../components/FlowMotif.jsx'
+import ResearchStudies from '../components/ResearchStudies.jsx'
 import Portrait from '../components/Portrait.jsx'
 import { profile } from '../data/profile.js'
-import { research } from '../data/research.js'
 import { asset } from '../lib/asset.js'
 import { useDocumentTitle } from '../lib/hooks.js'
 
+function scrollToResearch(e) {
+  e.preventDefault()
+  const el = document.getElementById('research')
+  if (!el) return
+  el.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+  el.focus({ preventScroll: true })
+}
+
 export default function Home() {
   useDocumentTitle(null)
-  const [pcm, sph] = research
-
   return (
     <>
       <section className="hero">
@@ -21,56 +25,50 @@ export default function Home() {
             <p className="hero__statement">{profile.statement}</p>
             <ul className="hero__facts">
               <li>
-                {profile.degree}, {profile.universityShort}, June 2026
+                {profile.degree}, {profile.universityShort}, 2026
               </li>
               <li>
                 CGPA {profile.cgpa}, ranked {profile.rank}
               </li>
-              <li>Looking for graduate research in CFD and numerical heat transfer</li>
             </ul>
             <div className="hero__actions">
-              <Link className="button" to={pcm.path}>
-                Read the PCM melting study
-              </Link>
+              <a className="button" href="#research" onClick={scrollToResearch}>
+                View research
+              </a>
               <a className="button button--outline" href={asset(profile.cvFile)} download>
                 Download CV (PDF)
               </a>
             </div>
           </div>
-          <div className="hero__figure">
-            <MeltSolverFigure />
+          <FlowMotif className="hero__visual" />
+        </div>
+      </section>
+
+      <section className="interests" aria-labelledby="interests-heading">
+        <div className="container interests__grid">
+          <div className="interests__intro">
+            <h2 id="interests-heading" className="section__title">
+              Research interests
+            </h2>
+            <p>{profile.interestsIntro}</p>
           </div>
+          <ul className="interests__list">
+            {profile.interests.map((item) => (
+              <li key={item.title}>
+                <span className="interests__title">{item.title}</span>
+                <span className="interests__detail">{item.detail}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       <section className="section" aria-labelledby="research-heading">
         <div className="container">
-          <div className="section__head">
-            <h2 id="research-heading" className="section__title">
-              Research
-            </h2>
-            <p className="section__intro">
-              Two simulation studies, one with a finite-volume solver and one with a particle method. For each, I mark
-              which parts of the work were mine.
-            </p>
-          </div>
-          <ResearchEntry item={pcm} lead />
-          <ResearchEntry item={sph} />
-        </div>
-      </section>
-
-      <section className="section" aria-labelledby="compare-heading">
-        <div className="container">
-          <div className="section__head">
-            <h2 id="compare-heading" className="section__title">
-              The same checks, two discretizations
-            </h2>
-            <p className="section__intro">
-              The two studies use different numerical methods but answer the same questions: what model, what
-              resolution, how it was verified, and how it compares with experiment.
-            </p>
-          </div>
-          <MethodComparison />
+          <h2 id="research" className="section__title research-heading" tabIndex={-1}>
+            <span id="research-heading">Research</span>
+          </h2>
+          <ResearchStudies />
         </div>
       </section>
 
@@ -82,7 +80,7 @@ export default function Home() {
               <h2 id="about-heading" className="section__title">
                 About me
               </h2>
-              <div className="prose">
+              <div className="prose justify-text">
                 <p>
                   I graduated in June 2026 from the Department of Naval Architecture and Marine Engineering at BUET with
                   a CGPA of 3.77 / 4.00, fourth in a class of 55. My coursework included fluid mechanics, heat
@@ -95,9 +93,11 @@ export default function Home() {
                   GPU-based SPH towing tank to predict the resistance of a benchmark container ship.
                 </p>
                 <p>
-                  I am looking for graduate research opportunities in computational fluid dynamics and numerical heat
-                  transfer, particularly thermal-fluid problems involving phase change, natural convection and thermal
-                  management.
+                  I want to deepen my understanding of computational fluid dynamics and related areas through further
+                  study and research. I am particularly interested in how numerical methods can help us understand
+                  complex fluid-flow and heat-transfer problems, including applications in thermal management and phase
+                  change materials. I am also keen to explore related areas as I continue to develop my research
+                  interests.
                 </p>
               </div>
               <p className="bio__links">

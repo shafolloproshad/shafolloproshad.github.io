@@ -1,45 +1,42 @@
-import { Link } from 'react-router'
 import StudyHeader from '../components/StudyHeader.jsx'
 import Toc from '../components/Toc.jsx'
-import Figure, { OwnerTag } from '../components/Figure.jsx'
+import Figure from '../components/Figure.jsx'
 import Equation from '../components/Equation.jsx'
-import ContributionMatrix from '../components/ContributionMatrix.jsx'
+import Contribution from '../components/Contribution.jsx'
 import ConvergenceTable from '../components/ConvergenceTable.jsx'
 import FroudeExplorer from '../components/FroudeExplorer.jsx'
 import { CtChart } from '../components/charts.jsx'
 import Rich from '../components/Rich.jsx'
-import { sphContributions, kcsParticulars, domain, sphParameters, validationRows } from '../data/sph.js'
+import { kcsParticulars, domain, sphParameters, validationRows } from '../data/sph.js'
+import { research } from '../data/research.js'
 import { useDocumentTitle } from '../lib/hooks.js'
 
 const TOC = [
   { id: 'overview', label: 'Overview' },
-  { id: 'objectives', label: 'Objectives' },
-  { id: 'contributions', label: 'My contributions' },
-  { id: 'model', label: 'Numerical model' },
-  { id: 'convergence', label: 'Particle convergence' },
-  { id: 'validation', label: 'Validation' },
-  { id: 'free-surface', label: 'Free-surface patterns' },
-  { id: 'transfer', label: 'Relation to mesh-based CFD' },
-  { id: 'findings', label: 'Key findings' },
-  { id: 'skills', label: 'Skills demonstrated' },
-  { id: 'limitations', label: 'Limitations' },
-  { id: 'thesis', label: 'Thesis details' },
+  { id: 'model', label: 'Numerical Model' },
+  { id: 'validation', label: 'Model Validation' },
+  { id: 'results', label: 'Results and Discussion' },
+  { id: 'conclusion', label: 'Conclusion' },
+  { id: 'contribution', label: 'My Contribution' },
 ]
+
+// My contribution, shared with the thesis entry on the home and Research pages.
+const thesis = research.find((r) => r.slug === 'sph-ship-resistance')
 
 export default function SphThesis() {
   useDocumentTitle('SPH prediction of ship resistance')
 
   return (
-    <article>
+    <article className="study study--sph">
       <StudyHeader
         status="Undergraduate thesis"
         title="Prediction of Calm Water Resistance of a Ship Using Smoothed Particle Hydrodynamics (SPH)"
         authors={[{ name: 'Shafollo Proshad Gupto', me: true }, { name: 'Ahsan Ahmed' }]}
         meta={[
           ['Supervisor', 'Dr. Md. Mashiur Rahaman, Professor, BUET'],
-          ['Period', 'April 2025 – June 2026'],
           ['Method', 'Weakly compressible SPH, 3D, GPU'],
           ['Software', 'DualSPHysics v5.4, ParaView'],
+          ['Period', 'April 2025 – June 2026'],
         ]}
       />
 
@@ -49,163 +46,170 @@ export default function SphThesis() {
         </aside>
 
         <div className="article__main">
+          {/* ---------------------------------------------------------- */}
           <section id="overview" className="article__section">
             <h2>Overview</h2>
             <div className="prose">
               <p>
-                Calm-water resistance sets the propulsion power a ship needs. It is usually measured in a towing tank
-                or computed with mesh-based RANS solvers. This thesis tested whether a mesh-free method, weakly
-                compressible smoothed particle hydrodynamics (WCSPH) as implemented in the GPU solver DualSPHysics, can
-                predict the total resistance of a displacement hull with realistic geometry.
+                Accurate prediction of calm-water resistance is essential in ship design: resistance sets the
+                propulsion power a hull needs, and with it the fuel consumption and emissions. Resistance has
+                traditionally been obtained from towing-tank experiments and, increasingly, from mesh-based CFD solvers
+                of the Reynolds-averaged Navier–Stokes equations. Mesh-based methods can compute complex flows but
+                must cope with mesh deformation and distortion where the free surface deforms strongly. Mesh-free
+                particle methods such as Smoothed Particle Hydrodynamics (SPH) follow the free surface naturally, and
+                SPH has been applied widely to free-surface problems such as slamming and planing hulls. Its use for
+                predicting the calm-water resistance of displacement-type hulls, however, remains limited, and a
+                published comparison with a mesh-based solver used the mathematically defined Wigley hull, a simpler
+                form than a real ship.
               </p>
               <p>
-                The test case is the KRISO Container Ship (KCS), a standard benchmark with published towing-tank data.
-                Earlier SPH resistance studies used simple forms such as the mathematically defined Wigley hull, or
-                planing hulls where lift dominates. The KCS, with its bulbous bow and transom stern, combines wave-making
-                and viscous pressure effects that demand careful boundary treatment.
+                This thesis investigates whether the weakly compressible SPH formulation of the open-source GPU solver
+                DualSPHysics can predict the calm-water resistance of the KRISO Container Ship (KCS), a benchmark
+                displacement hull. A numerical towing tank with open boundaries was built, and the predicted total
+                resistance coefficient was validated against experimental towing-tank data at five Froude numbers
+                from 0.152 to 0.282.
+              </p>
+            </div>
+          </section>
+
+          {/* ---------------------------------------------------------- */}
+          <section id="model" className="article__section">
+            <h2>Numerical Model</h2>
+
+            <h3 className="article__h3">Mathematical Modeling</h3>
+            <div className="prose">
+              <p>
+                SPH represents the water by discrete particles instead of a computational mesh. Each particle carries
+                its position, velocity, density and pressure and moves with the flow, and a quantity at any point is
+                evaluated from the neighbouring particles inside a region of influence through a smoothing function, the
+                kernel <i>W</i>, with smoothing length <i>h</i>. The formulation rests on two steps: a kernel
+                approximation, which writes a function in integral form, and a particle approximation, which replaces
+                the integral by a sum over the neighbours <i>j</i> of particle <i>i</i>, each with mass <i>m</i>
+                <sub>j</sub> and density ρ<sub>j</sub>:
+              </p>
+            </div>
+            <Equation number="1" tex={String.raw`\langle F(\mathbf{r}) \rangle = \int_{\Omega} F(\mathbf{r}')\,W(\mathbf{r} - \mathbf{r}', h)\,\mathrm{d}\mathbf{r}'`} />
+            <Equation
+              number="2"
+              tex={String.raw`\langle F(\mathbf{r}_i) \rangle \approx \sum_{j=1}^{N} \frac{m_j}{\rho_j}\,F(\mathbf{r}_j)\,W(\mathbf{r}_i - \mathbf{r}_j, h)`}
+            />
+            <div className="prose">
+              <p>
+                The Wendland kernel is used because it balances accuracy against computational cost; particles interact
+                within a distance of 2<i>h</i>, with α<sub>D</sub> a normalisation constant and <i>q</i> = <i>r</i>/
+                <i>h</i>:
+              </p>
+            </div>
+            <Equation number="3" tex={String.raw`W(r, h) = \alpha_D\left(1 - \frac{q}{2}\right)^{4}(2q + 1), \qquad 0 \le q \le 2`} />
+            <div className="prose">
+              <p>
+                DualSPHysics implements a weakly compressible formulation (WCSPH): pressure is computed from density
+                through the Tait equation of state, with reference density ρ<sub>0</sub>, numerical speed of sound{' '}
+                <i>c</i>
+                <sub>0</sub> and polytropic constant γ<sub>p</sub>:
+              </p>
+            </div>
+            <Equation
+              number="4"
+              tex={String.raw`P_i = \frac{c_0^{2}\rho_0}{\gamma_p}\left[\left(\frac{\rho_i}{\rho_0}\right)^{\gamma_p} - 1\right]`}
+            />
+            <div className="prose">
+              <p>
+                The continuity and momentum equations are solved in discrete particle form. A density-diffusion term,
+                with coefficient δ, damps spurious density oscillations, and Γ<sub>i</sub> holds the viscous terms:
+              </p>
+            </div>
+            <Equation
+              number="5"
+              tex={String.raw`\frac{\mathrm{d}\rho_i}{\mathrm{d}t} = \sum_{j} m_j\,\mathbf{v}_{ij}\cdot\nabla_i W_{ij} + 2\delta h c_0 \sum_{j} \frac{m_j}{\rho_j}\left(\rho_i^{D} - \rho_j^{D}\right)\frac{\mathbf{r}_{ij}}{\lVert\mathbf{r}_{ij}\rVert^{2}}\cdot\nabla_i W_{ij}`}
+            />
+            <Equation
+              number="6"
+              tex={String.raw`\frac{\mathrm{d}\mathbf{v}_i}{\mathrm{d}t} = -\sum_{j} m_j\left(\frac{P_j}{\rho_j^{2}} + \frac{P_i}{\rho_i^{2}}\right)\nabla_i W_{ij} + \mathbf{g} + \boldsymbol{\Gamma}_i`}
+            />
+            <div className="prose">
+              <p>
+                Viscosity is modelled with a laminar term, with kinematic viscosity ν<sub>0</sub> = 1.0&nbsp;×&nbsp;10⁻⁶&nbsp;m²/s,
+                plus the Sub-Particle Scale (SPS) turbulence model, which accounts for unresolved turbulent stresses
+                through the SPS stress tensor τ<sup>ab</sup>:
+              </p>
+            </div>
+            <Equation
+              number="7"
+              tex={String.raw`\boldsymbol{\Gamma}_i = \sum_{j} m_j\,\frac{4\nu_0\,\mathbf{r}_{ij}\cdot\nabla_i W_{ij}}{(\rho_i + \rho_j)\left(r_{ij}^{2} + \eta^{2}\right)}\,\mathbf{v}_{ij} + \sum_{j} m_j\left(\frac{\tau_i^{ab} + \tau_j^{ab}}{\rho_i\,\rho_j}\right)\nabla_i^{a} W_{ij}`}
+            />
+            <div className="prose">
+              <p>
+                Velocity, density and position are advanced with the explicit Verlet scheme, with a periodic correction
+                step that limits numerical error. The time step is bounded by the Courant–Friedrichs–Lewy (CFL)
+                condition, which accounts for particle acceleration and viscous diffusion; <i>C</i>
+                <sub>CFL</sub> is the time-step coefficient and η a small parameter that prevents division by zero:
+              </p>
+            </div>
+            <Equation
+              number="8"
+              tex={String.raw`\begin{gathered} \Delta t = C_{\mathrm{CFL}}\min\left(\Delta t_f,\ \Delta t_{cv}\right) \\[6pt] \Delta t_f = \min_i\sqrt{\frac{h}{\lvert \mathrm{d}\mathbf{v}_i/\mathrm{d}t \rvert}}, \qquad \Delta t_{cv} = \min_i \frac{h}{c_0 + \max_j \dfrac{\lvert h\,\mathbf{v}_{ij}\cdot\mathbf{r}_{ij}\rvert}{r_{ij}^{2} + \eta^{2}}} \end{gathered}`}
+            />
+
+            <h3 className="article__h3">KCS Benchmark Hull</h3>
+            <div className="prose">
+              <p>
+                The KRISO Container Ship (KCS) is used as the benchmark hull. It is widely accepted as a standard model
+                in ship hydrodynamics because its experimental towing-tank resistance data are well documented, which
+                makes it suitable for validating numerical methods, and its bulbous bow and transom stern make it a
+                realistic displacement hull. A model-scale hull with a waterline length of 1 m was used in the
+                simulations.
               </p>
             </div>
             <Figure
-              src="media/sph/free-surface-all.webp"
-              alt="Five stacked top views of free-surface elevation around half of the KCS hull at Froude numbers 0.152, 0.195, 0.227, 0.260 and 0.282. The wake pattern grows stronger with speed."
-              caption="Free-surface elevation z / L_WL around the hull at the five Froude numbers studied."
-              source="Thesis"
-              owner="me"
-              size="narrow"
+              src="media/sph/kcs-body-plan.webp"
+              alt="Body plan and profile of the KCS hull showing section lines and the bulbous bow."
+              caption="Body plan of the KCS model hull."
             />
-          </section>
-
-          <section id="objectives" className="article__section">
-            <h2>Objectives</h2>
-            <div className="prose">
-              <ul>
-                <li>Develop an SPH model of the KCS hull in DualSPHysics to predict calm-water resistance.</li>
-                <li>Validate the predicted resistance against towing-tank data for the KCS.</li>
-                <li>Assess how accurate and reliable SPH is for displacement hulls.</li>
-                <li>Visualize and analyse the wave field around the hull.</li>
-              </ul>
-            </div>
-          </section>
-
-          <section id="contributions" className="article__section article__section--feature">
-            <h2>My contributions to this research</h2>
-            <div className="prose">
-              <p>
-                I completed this thesis jointly with Ahsan Ahmed under the supervision of Dr. Md. Mashiur Rahaman. My
-                part covered setting up and running the simulations, most of the resistance-coefficient calculation and
-                error analysis, the free-surface visualizations, and the original draft of the thesis.
-              </p>
-            </div>
-            <ContributionMatrix rows={sphContributions} caption="Stages of the thesis work" />
-          </section>
-
-          <section id="model" className="article__section">
-            <h2>
-              Numerical model <OwnerTag owner="me" />
-            </h2>
-
-            <h3 className="article__h3">Formulation</h3>
-            <div className="prose">
-              <p>
-                SPH represents the water as particles that move with the flow and carry mass, velocity, density and
-                pressure. Any field quantity at a particle is a kernel-weighted sum over its neighbours within a
-                distance 2<i>h</i>:
-              </p>
-            </div>
-            <Equation number="1" tex={String.raw`\langle F(\mathbf{r}_a)\rangle \approx \sum_{b} \frac{m_b}{\rho_b}\,F(\mathbf{r}_b)\,W(\mathbf{r}_a - \mathbf{r}_b, h)`} />
-            <Equation
-              number="2"
-              tex={String.raw`W(q) = \alpha_D\left(1 - \tfrac{q}{2}\right)^{4}(2q + 1),\quad 0 \le q \le 2,\quad q = \frac{r}{h},\quad \alpha_D = \frac{21}{16\pi h^{3}}`}
-            />
-            <div className="prose">
-              <p>
-                In the weakly compressible formulation, pressure follows from density through the Tait equation of
-                state, with the numerical speed of sound <i>c</i>
-                <sub>0</sub> chosen to keep density variations near 1%. The momentum equation then becomes a pairwise
-                sum, with Γ<sub>a</sub> holding the laminar and sub-particle-scale (SPS) viscous terms:
-              </p>
-            </div>
-            <Equation number="3" tex={String.raw`P = B\left[\left(\frac{\rho}{\rho_0}\right)^{\gamma} - 1\right],\qquad B = \frac{c_0^{2}\rho_0}{\gamma},\quad \gamma = 7`} />
-            <Equation
-              number="4"
-              tex={String.raw`\frac{\mathrm{d}\mathbf{v}_a}{\mathrm{d}t} = -\sum_{b} m_b\left(\frac{P_b}{\rho_b^{2}} + \frac{P_a}{\rho_a^{2}}\right)\nabla_a W_{ab} + \mathbf{g} + \boldsymbol{\Gamma}_a`}
-            />
-            <div className="prose">
-              <p>
-                A Fourtakas density-diffusion term damps spurious pressure oscillations, and the modified dynamic
-                boundary condition (mDBC) mirrors ghost nodes across the hull surface to enforce no-penetration and
-                no-slip without the artificial gap of the original boundary treatment.
-              </p>
-            </div>
-            <div className="figure-pair figure-pair--uneven">
-              <Figure
-                src="media/sph/mdbc.webp"
-                alt="Diagram of boundary particles (grey) and fluid particles (blue) with the boundary surface at half a particle spacing and normal vectors used to mirror ghost nodes."
-                caption="Modified dynamic boundary condition: boundary interface at dp/2 and normal vectors."
-                source="Thesis, Fig. 3.1"
-              />
-              <Figure
-                src="media/sph/kcs-body-plan.webp"
-                alt="Body plan and profile of the KCS hull showing section lines and the bulbous bow."
-                caption="Body plan of the KCS model hull."
-                source="Thesis, Fig. 4.1"
-              />
+            <div className="table-wrap" role="region" aria-label="KCS particulars" tabIndex={0}>
+              <table className="data-table">
+                <caption>Principal particulars of the KCS at full and model scale.</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Particular</th>
+                    <th scope="col">Full scale</th>
+                    <th scope="col">Model</th>
+                    <th scope="col">Unit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {kcsParticulars.map(([k, full, model, unit]) => (
+                    <tr key={k}>
+                      <th scope="row">
+                        <Rich>{k}</Rich>
+                      </th>
+                      <td>{full}</td>
+                      <td>{model}</td>
+                      <td>{unit}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            <h3 className="article__h3">Hull and numerical towing tank</h3>
+            <h3 className="article__h3">Computational Domain</h3>
             <div className="prose">
               <p>
-                The hull is held fixed and water flows past it, entering through an inflow buffer zone and leaving
-                through an outflow buffer zone. These open boundaries let a short domain represent a long towing tank.
-                The side and bottom walls are fixed boundaries placed far enough away to avoid shallow-water and
-                blockage effects. Each run simulated 20 s, and the total resistance coefficient was averaged over the
-                last 5 s:
+                The hull is held stationary while the surrounding water is given a velocity equal to the ship speed,
+                which reproduces the relative motion between hull and fluid. The domain is defined by the upstream and
+                downstream channel lengths, the channel width and the channel depth, chosen to leave room for the wake
+                behind the hull and to avoid restricted-water and shallow-water effects.
               </p>
             </div>
-            <Equation number="5" tex={String.raw`C_T = \frac{R_T}{\tfrac{1}{2}\,\rho\,S\,V^{2}}`} />
-            <div className="figure-pair">
+            <div className="domain-layout">
               <Figure
                 src="media/sph/domain-overview.webp"
                 alt="Three-dimensional view of the numerical tank with the KCS hull near the free surface and arrows showing flow direction from inlet to outlet."
-                caption="Numerical towing tank with the stationary hull; flow enters at one end and leaves at the other."
-                source="Thesis, Fig. 4.4"
+                caption="Three-dimensional view of the computational domain showing the position of the KCS hull."
               />
-              <Figure
-                src="media/sph/domain-2d.webp"
-                alt="Side-view schematic: inflow buffer on the left, hull at the free surface, outflow buffer on the right; 0.90 m upstream, 1.80 m downstream, 2.70 m total, 0.28 m depth."
-                caption="Longitudinal section of the domain with buffer zones and principal dimensions."
-                source="Thesis, Fig. 4.3"
-              />
-            </div>
-            <div className="table-pair">
-              <div className="table-wrap" role="region" aria-label="KCS particulars" tabIndex={0}>
-                <table className="data-table">
-                  <caption>Principal particulars of the KCS (thesis, Table 4.1).</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Particular</th>
-                      <th scope="col">Full scale</th>
-                      <th scope="col">Model</th>
-                      <th scope="col">Unit</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {kcsParticulars.map(([k, full, model, unit]) => (
-                      <tr key={k}>
-                        <th scope="row">
-                          <Rich>{k}</Rich>
-                        </th>
-                        <td>{full}</td>
-                        <td>{model}</td>
-                        <td>{unit}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
               <div className="table-wrap" role="region" aria-label="Domain dimensions" tabIndex={0}>
                 <table className="data-table">
-                  <caption>Computational domain (thesis, Table 4.2).</caption>
+                  <caption>Dimensions of the computational domain.</caption>
                   <tbody>
                     {domain.map(([k, rel, abs]) => (
                       <tr key={k}>
@@ -220,11 +224,27 @@ export default function SphThesis() {
                 </table>
               </div>
             </div>
-
-            <h3 className="article__h3">Solver parameters</h3>
+            <Figure
+              src="media/sph/domain-2d.webp"
+              alt="Side-view schematic: inflow buffer on the left, hull at the free surface, outflow buffer on the right; 0.90 m upstream, 1.80 m downstream, 2.70 m total, 0.28 m depth."
+              caption="Longitudinal section of the domain with the inflow and outflow buffer zones and principal dimensions."
+              size="wide"
+            />
+            <div className="prose">
+              <p>
+                The front and rear boundaries are open. DualSPHysics implements them as inflow and outflow buffer
+                zones of several particle layers, which keep the kernel support complete and allow particles to be
+                added at the inlet and removed at the outlet; velocity, density and pressure in the buffers are
+                extrapolated from ghost nodes in the adjacent fluid. A relatively short domain can therefore represent
+                a long towing tank at a lower computational cost. The side and bottom walls are fixed boundaries, and
+                solid boundaries use the modified Dynamic Boundary Condition (mDBC): the boundary surface lies midway
+                between the outermost boundary particles and the adjacent fluid, normals are computed with respect to
+                it, and ghost nodes reflected into the fluid enforce the boundary condition.
+              </p>
+            </div>
             <div className="table-wrap" role="region" aria-label="SPH parameters" tabIndex={0}>
               <table className="data-table data-table--kv">
-                <caption>DualSPHysics settings (thesis, Table 4.3).</caption>
+                <caption>DualSPHysics settings.</caption>
                 <tbody>
                   {sphParameters.map(([k, v]) => (
                     <tr key={k}>
@@ -239,64 +259,67 @@ export default function SphThesis() {
             </div>
           </section>
 
-          <section id="convergence" className="article__section">
-            <h2>
-              Particle convergence <OwnerTag owner="me" />
-            </h2>
+          {/* ---------------------------------------------------------- */}
+          <section id="validation" className="article__section">
+            <h2>Model Validation</h2>
             <div className="prose">
               <p>
-                In SPH the particle spacing dp plays the role that cell size plays in a mesh. Four spacings were run at
-                Fr = 0.26. The coarsest, 11 mm, over-predicted <i>C</i>
-                <sub>T</sub> by 88.2%; at 9 mm the error was 2.43%, and at 8 mm 1.99%. The final refinement improved
-                accuracy by only 0.44 percentage points while increasing run time by 52.98%, so 9 mm (1.1 million
-                particles) was used for the rest of the study.
+                The model was checked against experimental towing-tank data for the KCS. The quantity compared is the
+                total resistance coefficient, obtained from the simulated total resistance force <i>R</i>
+                <sub>T</sub>, where ρ is the water density, <i>S</i> the wetted surface area and <i>V</i> the ship
+                speed:
               </p>
             </div>
-            <ConvergenceTable />
-            <Figure
-              src="media/sph/convergence.webp"
-              alt="Total resistance coefficient against time for particle spacings of 8, 9, 10 and 11 mm with the experimental value as a horizontal line. The 11 mm curve sits far above; 8 and 9 mm oscillate around the experimental line."
-              caption="C_T time histories at the four particle spacings, against the experimental value."
-              source="Thesis, Fig. 4.5"
-              owner="me"
-            />
-
-            <h3 className="article__h3">
-              Filtering the resistance signal <OwnerTag owner="team" />
-            </h3>
+            <Equation number="9" tex={String.raw`C_T = \frac{R_T}{\tfrac{1}{2}\,\rho\,S\,V^{2}}`} />
             <div className="prose">
               <p>
-                Weakly compressible SPH produces high-frequency pressure noise, so the raw resistance history was
-                passed through a fourth-order Butterworth low-pass filter with a 1 Hz cut-off before averaging. The
-                filtered signal settles cleanly on a mean value.
+                The computed <i>C</i>
+                <sub>T</sub> shows high-frequency fluctuations, so a fourth-order Butterworth low-pass filter with a
+                1 Hz cut-off was applied to the raw signal before averaging.
               </p>
             </div>
             <Figure
               src="media/sph/filtering.webp"
               alt="Unfiltered resistance coefficient oscillating strongly between about −10 and 15, with the 1 Hz filtered curve settling near the experimental value."
               caption="Unfiltered and 1 Hz low-pass filtered C_T at dp = 8 mm, Fr = 0.26."
-              source="Thesis, Fig. 4.6"
-              owner="team"
+            />
+
+            <div className="prose">
+              <p>
+                Convergence was assessed at Fr = 0.26 with four particle spacings of 11, 10, 9 and 8 mm. The predicted{' '}
+                <i>C</i>
+                <sub>T</sub> approaches the experimental value as the resolution increases: the error falls from 88.2%
+                at 11 mm to 2.43% at 9 mm. Refining further to 8 mm improves the error by only 0.44 percentage points
+                while increasing the simulation time by 52.98%, so the 9 mm spacing (about 1.1 million particles) was
+                selected as the practical balance between accuracy and computational cost and used for all other
+                simulations. All runs used an NVIDIA GeForce RTX 4050 GPU.
+              </p>
+            </div>
+            <ConvergenceTable />
+            <Figure
+              src="media/sph/convergence.webp"
+              alt="Total resistance coefficient against time for particle spacings of 8, 9, 10 and 11 mm with the experimental value as a horizontal line. The 11 mm curve sits far above; 8 and 9 mm oscillate around the experimental line."
+              caption="Convergence of the total resistance coefficient, C_T, at Fr = 0.26 for the four particle spacings, against the experimental value."
             />
           </section>
 
-          <section id="validation" className="article__section">
-            <h2>
-              Validation against towing-tank data <OwnerTag owner="me" />
-            </h2>
+          {/* ---------------------------------------------------------- */}
+          <section id="results" className="article__section">
+            <h2>Results and Discussion</h2>
+
+            <h3 className="article__h3">Prediction of the Total Resistance Coefficient</h3>
             <div className="prose">
               <p>
-                With dp = 9 mm, the predicted <i>C</i>
-                <sub>T</sub> was compared with experiment at five Froude numbers. Errors range from 0.69% at Fr =
-                0.152 to 6.35% at Fr = 0.226, all below 6.5%. SPH under-predicts at every speed. Because only total
-                resistance was evaluated, the thesis does not separate the likely sources: the SPS model’s treatment of
-                near-wall viscous flow, and density-driven pressure fluctuations at the hull surface.
+                With the 9 mm spacing, <i>C</i>
+                <sub>T</sub> was predicted at five Froude numbers from 0.152 to 0.282 and compared with the measured
+                values. The predictions agree with experiment to within 6.5% across the whole range, which supports
+                using the model to study the resistance and the wave field around the hull.
               </p>
             </div>
             <CtChart rows={validationRows} />
-            <div className="table-wrap" role="region" aria-label="Validation results" tabIndex={0}>
+            <div className="table-wrap" role="region" aria-label="Resistance results" tabIndex={0}>
               <table className="data-table">
-                <caption>Resistance at dp = 9 mm (thesis, Table 5.1).</caption>
+                <caption>Predicted and measured resistance at dp = 9 mm.</caption>
                 <thead>
                   <tr>
                     <th scope="col">Fr</th>
@@ -328,20 +351,25 @@ export default function SphThesis() {
                 </tbody>
               </table>
             </div>
+
+            <div className="prose">
+              <p>
+                The error is smallest at Fr = 0.152 (0.69%) and largest at Fr = 0.226 (6.35%), and SPH under-predicts
+                the resistance at every speed. The predictions follow the experimental trend: <i>C</i>
+                <sub>T</sub> falls from Fr = 0.152 to a minimum at Fr = 0.226 and then rises steeply to Fr = 0.282, where
+                SPH gives 4.314&nbsp;×&nbsp;10⁻³ against 4.501&nbsp;×&nbsp;10⁻³ measured. Because only the total resistance was evaluated,
+                the thesis does not separate the likely sources of the under-prediction: the SPS model’s treatment of
+                near-wall viscous flow, and density-driven pressure fluctuations at the hull surface.
+              </p>
+            </div>
             <Figure
               src="media/sph/ct-time-series.webp"
               alt="Four panels of C_T against time at Froude numbers 0.152, 0.195, 0.226 and 0.282. Each rises from a start-up transient and then oscillates around the experimental value."
               caption="C_T time histories at Fr = 0.152, 0.195, 0.226 and 0.282 against experiment."
-              source="Thesis, Fig. 5.1"
-              owner="me"
               size="wide"
             />
-          </section>
 
-          <section id="free-surface" className="article__section">
-            <h2>
-              Free-surface patterns <OwnerTag owner="me" />
-            </h2>
+            <h3 className="article__h3">Free Surface Visualization</h3>
             <div className="prose">
               <p>
                 The wave field shows a distinct bow wave, a trough along the midbody, and alternating crests and troughs
@@ -354,132 +382,38 @@ export default function SphThesis() {
             <FroudeExplorer />
           </section>
 
-          <section id="transfer" className="article__section">
-            <h2>Relation to mesh-based CFD</h2>
+          {/* ---------------------------------------------------------- */}
+          <section id="conclusion" className="article__section">
+            <h2>Conclusion</h2>
             <div className="prose">
               <p>
-                SPH and finite-volume methods discretize the equations very differently, but the questions that decide
-                whether a result can be trusted are the same. Working through them in a particle method meant answering
-                each one explicitly.
+                The thesis shows that weakly compressible SPH, run on a GPU in DualSPHysics, can predict the calm-water
+                resistance of the KCS displacement hull with good accuracy. Across the five Froude numbers from 0.152 to
+                0.282, the predicted total resistance coefficient was within 0.69–6.35% of the towing-tank measurements,
+                below 6.5% throughout, with SPH under-predicting at every speed.
               </p>
-            </div>
-            <ul className="skill-list">
-              <li>
-                <b>Resolution study</b>
-                <span>
-                  Choosing dp is the particle counterpart of mesh refinement: error fell from 88.2% to 2.43% between 11
-                  and 9 mm, and the last step was weighed against its cost.
-                </span>
-              </li>
-              <li>
-                <b>Boundary conditions</b>
-                <span>
-                  Buffer zones act as inlet and outlet conditions so a 2.7 m domain can stand in for a long tank; mDBC
-                  enforces the wall condition at the hull.
-                </span>
-              </li>
-              <li>
-                <b>Pressure from density</b>
-                <span>
-                  Unlike a pressure-based finite-volume solver, WCSPH computes pressure from density through an equation
-                  of state. The resulting noise is why the force signal had to be filtered before averaging.
-                </span>
-              </li>
-              <li>
-                <b>Validation</b>
-                <span>
-                  A signed error against towing-tank data at every Froude number, the same check used for RANS
-                  resistance predictions of the KCS.
-                </span>
-              </li>
-            </ul>
-          </section>
-
-          <section id="findings" className="article__section">
-            <h2>Key findings</h2>
-            <ul className="findings">
-              <li>
-                <b>9 mm</b>
-                <span>particle spacing balances accuracy and cost: 2.43% error at Fr = 0.26 in a 1.68 h GPU run.</span>
-              </li>
-              <li>
-                <b>&lt; 6.5%</b>
-                <span>resistance error across Fr = 0.152–0.282, with SPH under-predicting at every speed.</span>
-              </li>
-              <li>
-                <b>Hours, not days</b>
-                <span>of run time with GPU-accelerated DualSPHysics, against the days a CPU run would need.</span>
-              </li>
-              <li>
-                <b>Wave pattern</b>
-                <span>bow wave and stern wake strengthen with Froude number as expected for a displacement hull.</span>
-              </li>
-            </ul>
-          </section>
-
-          <section id="skills" className="article__section">
-            <h2>Skills demonstrated</h2>
-            <p className="article__lead">Based on the parts of the thesis I carried out.</p>
-            <ul className="skill-list">
-              <li>
-                <b>Computational domain design</b>
-                <span>A numerical towing tank with open boundaries sized to avoid wall and depth effects.</span>
-              </li>
-              <li>
-                <b>Solver configuration</b>
-                <span>Kernel, viscosity model, density diffusion, boundary condition and time stepping in DualSPHysics.</span>
-              </li>
-              <li>
-                <b>Resolution sensitivity</b>
-                <span>A four-level convergence study and an explicit accuracy-versus-cost decision.</span>
-              </li>
-              <li>
-                <b>Validation and error analysis</b>
-                <span>
-                  <Rich>C_T against experiment at five Froude numbers.</Rich>
-                </span>
-              </li>
-              <li>
-                <b>GPU computing</b>
-                <span>Million-particle 3D simulations on a single GPU.</span>
-              </li>
-              <li>
-                <b>Scientific visualization and writing</b>
-                <span>Free-surface fields in ParaView; the first draft of the thesis.</span>
-              </li>
-            </ul>
-          </section>
-
-          <section id="limitations" className="article__section">
-            <h2>Limitations and next steps</h2>
-            <div className="prose">
-              <ul>
-                <li>
-                  The hull was fixed in calm water. Waves, ship motions and added resistance are the obvious extension.
-                </li>
-                <li>
-                  Particle spacing was uniform everywhere. Variable resolution, fine near the hull and coarse far away,
-                  would cut the cost substantially.
-                </li>
-                <li>Wave patterns were visualized but not compared with measured wave profiles.</li>
-                <li>Only total resistance was evaluated, so viscous and pressure components were not separated.</li>
-              </ul>
-            </div>
-          </section>
-
-          <section id="thesis" className="article__section">
-            <h2>Thesis details</h2>
-            <div className="citation">
               <p>
-                <strong>Shafollo Proshad Gupto</strong> and Ahsan Ahmed. “Prediction of Calm Water Resistance of a Ship
-                Using Smoothed Particle Hydrodynamics (SPH).” B.Sc. thesis (NAME 400), Department of Naval
-                Architecture and Marine Engineering, Bangladesh University of Engineering and Technology, June 2026.
-                Supervisor: Dr. Md. Mashiur Rahaman.
-              </p>
-              <p className="citation__note">
-                For the full thesis, <Link to="/contact">contact me</Link>.
+                Particle spacing controls the accuracy much as cell size does in a mesh. At Fr = 0.26 the error fell
+                from 88.2% at 11 mm to 2.43% at 9 mm, while refining to 8 mm improved it by only 0.44 percentage points
+                for 52.98% more run time, so the 9 mm spacing offered the best balance between accuracy and
+                computational cost. The simulations also reproduced the free-surface behaviour expected of a
+                displacement hull, with the bow wave and stern wake becoming more pronounced as the Froude number
+                increases. Together, these results demonstrate the applicability of SPH to predicting the calm-water
+                resistance and free-surface flow of displacement-type hulls.
               </p>
             </div>
+          </section>
+
+          {/* ---------------------------------------------------------- */}
+          <section id="contribution" className="article__section">
+            <h2>My Contribution</h2>
+            <div className="prose">
+              <p>
+                I completed this thesis jointly with Ahsan Ahmed under the supervision of Dr. Md. Mashiur Rahaman. My
+                part of the work is summarised below.
+              </p>
+            </div>
+            <Contribution items={thesis.myContribution} title={null} />
           </section>
         </div>
       </div>

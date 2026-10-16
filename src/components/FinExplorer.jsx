@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { finArms } from '../lib/meltModel.js'
+import { finArms } from '../lib/finGeometry.js'
 import { finCases, caseOutcomes } from '../data/pcm.js'
 import Segmented from './Segmented.jsx'
 
@@ -62,7 +62,6 @@ export default function FinExplorer() {
             <dd>{out.peakLmli40.toFixed(2)}</dd>
           </div>
         </dl>
-        {out.note && <p className="explorer__note">{out.note}</p>}
       </div>
 
       <div className="explorer__figure">
@@ -100,12 +99,9 @@ export default function FinExplorer() {
             50 mm × 50 mm PCM region, fin 2 mm thick
           </text>
         </svg>
-        <p className={simulated ? 'explorer__status' : 'explorer__status explorer__status--off'} role="status">
-          {simulated
-            ? `Case ${caseId} at ${angle}° was simulated.`
-            : `Not simulated: Case ${caseId} was run from 10° to ${MAX_ANGLE[caseId]}°.`}
+        <p className="explorer__status explorer__status--off" role="status">
+          {simulated ? '' : `Not simulated: Case ${caseId} was run from 10° to ${MAX_ANGLE[caseId]}°.`}
         </p>
-        <p className="explorer__fineprint">Arm lengths, thickness and angle to scale; the junction is drawn at mid-height.</p>
       </div>
     </div>
   )

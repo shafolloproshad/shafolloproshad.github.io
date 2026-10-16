@@ -21,8 +21,6 @@ export default function FroudeExplorer() {
           src={row.image}
           alt={`Top view of the free-surface elevation, z over L_WL, around the KCS hull at Froude number ${fr}.`}
           caption={`Free-surface elevation z / L_WL at Fr = ${fr.toFixed(3)}, viewed from above (flow left to right).`}
-          source="Thesis, Figs. 5.3–5.4"
-          owner="me"
           size="wide"
         />
         <dl className="froude__stats">

@@ -1,45 +1,6 @@
 // Numbers and tables for the thesis page, taken from the thesis book
 // (Tables 4.1–4.4 and 5.1). Do not round or re-derive.
 
-export const sphContributions = [
-  {
-    stage: 'Numerical towing tank',
-    detail: 'DualSPHysics case definition: domain, hull placement, inflow/outflow buffer zones, mDBC and solver parameters.',
-    mine: true,
-  },
-  {
-    stage: 'Particle-convergence simulations',
-    detail: 'Four particle spacings (11, 10, 9, 8 mm) at Fr = 0.26 on the GPU.',
-    mine: true,
-  },
-  {
-    stage: 'Froude-number sweep',
-    detail: 'Runs at Fr = 0.152, 0.195, 0.226 and 0.282 with the 9 mm resolution.',
-    mine: true,
-  },
-  {
-    stage: 'Signal filtering',
-    detail: 'Fourth-order Butterworth low-pass filter (1 Hz) on the raw resistance histories.',
-    mine: false,
-  },
-  {
-    stage: 'Resistance coefficient and error analysis',
-    detail: 'C_T from the filtered resistance and comparison with towing-tank data.',
-    mine: true,
-    note: 'Most of it',
-  },
-  {
-    stage: 'Free-surface visualization',
-    detail: 'Wave-elevation fields around the hull in ParaView.',
-    mine: true,
-  },
-  {
-    stage: 'Thesis writing',
-    detail: 'Original draft of the thesis book.',
-    mine: true,
-  },
-]
-
 export const kcsParticulars = [
   ['Length between perpendiculars, L_PP', '230', '0.989', 'm'],
   ['Length of waterline, L_WL', '232', '1', 'm'],

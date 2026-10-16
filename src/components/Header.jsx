@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router'
-import Glyph from './Glyph.jsx'
 
 const NAV = [
   { to: '/research', label: 'Research' },
@@ -26,8 +25,7 @@ export default function Header() {
     <header className="site-header">
       <div className="container site-header__inner">
         <Link to="/" className="wordmark" aria-label="Shafollo Proshad Gupto, home">
-          <Glyph className="wordmark__glyph" />
-          <span>Shafollo Proshad Gupto</span>
+          Shafollo Proshad Gupto
         </Link>
 
         <button

@@ -5,11 +5,11 @@
 // Section kinds:
 //   timeline   dated entries (period on the left, details on the right)
 //   list       short items without dates (research interests)
-//   skills     label–value rows
+//   skills     category, tools and a short description
 //   references referee cards
 //
 // Timeline entry fields (all optional except title):
-//   period, title, to (link for the title), org,
+//   period, title, to (link for the title), org, orgLink: { text, href } (links part of org),
 //   meta: lines of { label, value, to, work } shown under the title
 //   lines: short plain lines, courses: relevant courses,
 //   points: bullet list, contributions: "My Contributions" box,
@@ -145,11 +145,52 @@ export const cv = [
     section: 'Technical Skills',
     kind: 'skills',
     items: [
-      { group: 'CAD & 3D Modelling', value: 'AutoCAD, Rhinoceros 3D' },
-      { group: 'Programming Languages', value: 'C++, Fortran, Python' },
-      { group: 'Structural Analysis', value: 'ABAQUS' },
-      { group: 'Fluid Flow Analysis', value: 'ANSYS FLUENT, DualSPHysics' },
-      { group: 'Ship Design', value: 'MAXSURF' },
+      {
+        group: 'CAD & 3D Modelling',
+        value: 'Rhinoceros 3D, AutoCAD',
+        detail:
+          'Used both tools in the undergraduate ship-design project to model vessel geometry and draw ship components. Also prepared KCS hull geometry for numerical resistance simulations using Rhinoceros 3D.',
+      },
+      {
+        group: 'Fluid Flow Analysis',
+        value: 'ANSYS Fluent, DualSPHysics, ParaView',
+        detail:
+          'Simulated PCM melting and natural convection in ANSYS Fluent; investigated KCS calm-water resistance using DualSPHysics; and post-processed and visualised simulation results in ParaView.',
+      },
+      {
+        group: 'Programming & Numerical Computation',
+        value: 'Python, MATLAB, C++, Fortran',
+        detail:
+          'Used Python for research-data processing, filtering, calculations, and graph generation. Applied MATLAB to numerical ODE solutions and integration methods. Developed a C++ structured mesh generator as a course project, including node and element generation and element aspect-ratio and quality evaluation. Studied Fortran programming as part of the Computer Programming in Ship Design-I course.',
+      },
+      {
+        group: 'Structural Analysis',
+        value: 'ABAQUS',
+        detail:
+          'Performed plane-stress, tangential-stress, compression, and buckling analyses of structural components, including truss systems, in Ship Structure Sessional.',
+      },
+      {
+        group: 'Ship Design & Naval Architecture',
+        value: 'MAXSURF',
+        detail:
+          'Performed resistance, hydrostatic, intact and damage stability, and freeboard analyses for the undergraduate ship-design project and the WFSA ferry-design competition.',
+      },
+    ],
+  },
+  {
+    id: 'experience',
+    section: 'Professional Experience',
+    kind: 'timeline',
+    entries: [
+      {
+        period: 'Jan 2025 – Feb 2025',
+        title: 'Intern',
+        org: 'Dockyard & Engineering Works Ltd, Bangladesh Navy, Narayanganj, Bangladesh',
+        // Link on the organisation name, as in the CV PDF
+        orgLink: { text: 'Dockyard & Engineering Works Ltd', href: 'https://www.dewbn.gov.bd/' },
+        summary:
+          'Completed shipyard practice at DEWBN as part of NAME 310, gaining practical exposure to shipbuilding processes, including welding, NDT inspections, material flow, pipe fabrication, and marine engine installation. Developed an understanding of ship production workflows and the practical constraints involved in translating engineering designs into physical marine structures.',
+      },
     ],
   },
   {
@@ -163,18 +204,6 @@ export const cv = [
         period: '2026',
         title: '3rd Prize in “Worldwide Ferry Safety Association Design Competition 2026”',
         org: 'Team Black Pearl',
-      },
-    ],
-  },
-  {
-    id: 'experience',
-    section: 'Professional Experience',
-    kind: 'timeline',
-    entries: [
-      {
-        period: 'Jan 2024 – Feb 2025',
-        title: 'Intern',
-        org: 'Dockyard & Engineering Works Ltd, Bangladesh Navy, Narayanganj, Bangladesh',
       },
     ],
   },

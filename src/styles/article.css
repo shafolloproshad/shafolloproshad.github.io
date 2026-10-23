@@ -955,7 +955,7 @@
 /* Skill values line up with the text of the timeline entries */
 .cv-skills {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-5);
   margin: 0;
 }
 
@@ -972,6 +972,16 @@
 .cv-skills dd {
   margin: 0;
   color: var(--ink-2);
+}
+
+/* Tools in the category, then how they were used */
+.cv-skills__tools {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cv-skills__detail {
+  margin-top: 2px;
 }
 
 .cv-refs {
@@ -1028,6 +1038,13 @@
 
   .cv-skills {
     gap: var(--space-4);
+  }
+
+  /* Category as a small label above the tools, like the dates above timeline entries */
+  .cv-skills dt {
+    font-size: var(--fs-14);
+    font-weight: 400;
+    color: var(--ink-3);
   }
 }
 

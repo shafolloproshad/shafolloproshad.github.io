@@ -53,7 +53,11 @@ function Timeline({ entries }) {
             <p className="timeline__title">
               <MaybeLink to={e.to}>{e.title}</MaybeLink>
             </p>
-            {e.org && <p className="timeline__org">{e.org}</p>}
+            {e.org && (
+              <p className="timeline__org">
+                <Org e={e} />
+              </p>
+            )}
             {e.meta?.map((m) => (
               <p key={m.value} className={`timeline__meta${m.work ? ' timeline__meta--work' : ''}`}>
                 {m.label && <span className="timeline__label">{m.label}: </span>}
@@ -97,6 +101,20 @@ function Timeline({ entries }) {
   )
 }
 
+// Organisation line; `orgLink` turns its leading name into a link (opens in a new tab).
+function Org({ e }) {
+  const l = e.orgLink
+  if (!l || !e.org.startsWith(l.text)) return e.org
+  return (
+    <>
+      <a href={l.href} target="_blank" rel="noreferrer">
+        {l.text}
+      </a>
+      {e.org.slice(l.text.length)}
+    </>
+  )
+}
+
 function Citation({ c }) {
   return (
     <>
@@ -135,7 +153,10 @@ function Skills({ items }) {
       {items.map((g) => (
         <div key={g.group}>
           <dt>{g.group}</dt>
-          <dd>{g.value}</dd>
+          <dd>
+            <p className="cv-skills__tools">{g.value}</p>
+            {g.detail && <p className="cv-skills__detail">{g.detail}</p>}
+          </dd>
         </div>
       ))}
     </dl>
